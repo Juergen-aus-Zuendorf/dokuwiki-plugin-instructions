@@ -59,6 +59,11 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 			$match = preg_replace('/__/', '<u>', $match, 1); 
 			$match = preg_replace('/__/', '</u>', $match, 1); 
 		};
+		// Codetext:
+		while (strpos($match, "''") !== false) {
+			$match = preg_replace("/''/", '<code>', $match, 1); 
+			$match = preg_replace("/''/", '</code>', $match, 1); 
+		};
 		// Verarbeitung Wiki-Links:
 		while (strpos($match, '[[') !== false) {
 			$s1 = strpos($match, '[[') + 2;
