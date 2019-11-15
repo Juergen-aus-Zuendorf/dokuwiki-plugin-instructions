@@ -28,10 +28,30 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
     }
 
     function handle($match, $state, $pos, Doku_Handler $handler){
-        global $conf;
-        $this->Info = $this->getInfo();
-        $this->Info['PluginPath'] = DOKU_PLUGIN.$this->Info['base'].'/';
 		
+		// aktuelle Seite "@ID@" und "@PAGE@":
+		global $ID, $INFO;
+		$urldoku = DOKU_URL;
+		$urlpage = DOKU_URL."doku.php?id=".$ID;
+		
+		$pg_curr = $INFO['id'];
+		if (strrpos($pg_curr,":") > 0) {
+			$pg_curr = substr(strrchr($INFO['id'], ":"), 1);
+		};
+		$id_curr = $ID;
+		if (strrpos($id_curr,":") > 0) {
+			$id_curr = substr(strrchr($ID, ":"), 1);
+		};
+		$ns_long = substr(strrchr($urlpage, "="), 1);
+		$ns_long = substr($ns_long,0,strrpos($ns_long,":"));
+		$ns_curr = $ns_long;
+		if (strrpos($ns_long,":") > 0) {
+			$ns_curr = substr(strrchr($ns_long, ":"), 1);
+		};
+		
+print_r("ID = ".$ID."<br>INFO-id = ".$INFO['id']."<br>DOKU_URL = ".DOKU_URL."<br><br>");
+
+print_r("URLDOKU = ".$urldoku."<br>URLPAGE = ".$urlpage."<br>PG_CURR = ".$pg_curr."<br>ID_CURR = ".$id_curr."<br>NSLONG = ".$ns_long."<br>NSCURR = ".$ns_curr);
 		
         // Eingabe-Wert verarbeiten
 		$match = substr($match, 8, -2);
@@ -77,7 +97,25 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 			$match = preg_replace('/\[\[/', '<a href="'.DOKU_BASE.'/doku.php?id=', $match, 1); 
 			$match = preg_replace('/\]\]/', '">'.$title.'</a>', $match, 1); 
 		};
-		
+		// Platzhalter für Namensraum und aktuelle Seite:
+		while (strpos($match, '@PAGE@') !== false) {
+			$match = preg_replace('/@PAGE@/', $pg_curr, $match, 1); 
+		}
+		while (strpos($match, '@ID@') !== false) {
+			$match = preg_replace('/@ID@/', $id_curr, $match, 1); 
+		}
+		while (strpos($match, '@NS@') !== false) {
+			$match = preg_replace('/@NS@/', $ns_long, $match, 1); 
+		}
+		while (strpos($match, '@CURNS@') !== false) {
+			$match = preg_replace('/@CURNS@/', $ns_curr, $match, 1); 
+		}
+		while (strpos($match, '@URL_DOKU@') !== false) {
+			$match = preg_replace('/@URL_DOKU@/', $urldoku, $match, 1); 
+		}
+		while (strpos($match, '@URL_PAGE@') !== false) {
+			$match = preg_replace('/@URL_PAGE@/', $urlpage, $match, 1); 
+		}
 		
 		// Parameter aufspalten:
 		$param = explode('|-',$match);
