@@ -48,11 +48,7 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 		if (strrpos($ns_long,":") > 0) {
 			$ns_curr = substr(strrchr($ns_long, ":"), 1);
 		};
-		
-print_r("ID = ".$ID."<br>INFO-id = ".$INFO['id']."<br>DOKU_URL = ".DOKU_URL."<br><br>");
-
-print_r("URLDOKU = ".$urldoku."<br>URLPAGE = ".$urlpage."<br>PG_CURR = ".$pg_curr."<br>ID_CURR = ".$id_curr."<br>NSLONG = ".$ns_long."<br>NSCURR = ".$ns_curr);
-		
+				
         // Eingabe-Wert verarbeiten
 		$match = substr($match, 8, -2);
 		list($typ) = explode('>',$match);
