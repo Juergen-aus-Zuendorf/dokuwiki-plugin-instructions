@@ -24,7 +24,8 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
     }
 
     function connectTo($mode) {
-        $this->Lexer->addSpecialPattern('{{INSTR<.*?}}',$mode,'plugin_instructions');
+        $this->Lexer->addSpecialPattern('~~INSTR~~.*?~~END~~',$mode,'plugin_instructions');   // Syntax funktioniert zusammen mit Plugin CKGEdit
+        $this->Lexer->addSpecialPattern('{{INSTR<.*?}}',$mode,'plugin_instructions');         // veraltet wegen CKGEdit
     }
 
     function handle($match, $state, $pos, Doku_Handler $handler){
@@ -50,10 +51,18 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 		};
 				
         // Eingabe-Wert verarbeiten
-		$match = substr($match, 8, -2);
-		list($typ) = explode('>',$match);
+		$match = str_replace("{{INSTR<", '', $match);
+		$match = str_replace("}}", '', $match);
+		$match = str_replace("~~INSTR~~", '', $match);
+		$match = str_replace("~~END~~", '', $match);
+				
+		// Typ des Templates auslesen
+		if (substr_count($match,"~~") > 0) {
+			list($typ) = explode('~~',$match);
+		} else {
+			list($typ) = explode('>',$match);
+		}
 		$typ = strtolower($typ);
-		
 		
 		/* Steuerzeichen im Wiki-Code verarbeiten: */
 		// Zeilenumbruch:
@@ -93,6 +102,7 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 			$match = preg_replace('/\[\[/', '<a href="'.DOKU_BASE.'/doku.php?id=', $match, 1); 
 			$match = preg_replace('/\]\]/', '">'.$title.'</a>', $match, 1); 
 		};
+				
 		// Platzhalter für Namensraum und aktuelle Seite:
 		while (strpos($match, '@PAGE@') !== false) {
 			$match = preg_replace('/@PAGE@/', $pg_curr, $match, 1); 
