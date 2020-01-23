@@ -49,13 +49,15 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 		if (strrpos($ns_long,":") > 0) {
 			$ns_curr = substr(strrchr($ns_long, ":"), 1);
 		};
+
 				
         // Eingabe-Wert verarbeiten
 		$match = str_replace("{{INSTR<", '', $match);
 		$match = str_replace("}}", '', $match);
 		$match = str_replace("~~INSTR~~", '', $match);
 		$match = str_replace("~~END~~", '', $match);
-				
+		
+		
 		// Typ des Templates auslesen
 		if (substr_count($match,"~~") > 0) {
 			list($typ) = explode('~~',$match);
@@ -64,23 +66,28 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 		}
 		$typ = strtolower($typ);
 		
-		/* Steuerzeichen im Wiki-Code verarbeiten: */
-		// Zeilenumbruch:
+		
+		// Zeilenumbruch verarbeiten:
 		$match = str_replace(array("|+"), '<br>', $match);
+		
+		
+		// Steuerzeichen im Wiki-Code verarbeiten:
+		// (gilt nur für komplette Wörter mit führendem und nachfolgendem Leerzeichen)
+		
 		//zwei hintereinanderfolgende Leerzeichen sollen als Einrückung ausgegeben werden:
 		$match = str_replace(array("  "), '&nbsp; &nbsp;', $match);  		
 		// Kursivschrift:
-		while (strpos($match, '//') !== false) {
+		while ((strpos($match, ' //') !== false) or (strpos($match, '// ') !== false)) {
 			$match = preg_replace('/\/\//', '<i>', $match, 1); 
 			$match = preg_replace('/\/\//', '</i>', $match, 1); 
 		};
 		// Fettschrift:
-		while (strpos($match, '**') !== false) {
+		while ((strpos($match, ' **') !== false) or (strpos($match, '** ') !== false)) {
 			$match = preg_replace('/\*\*/', '<b>', $match, 1); 
 			$match = preg_replace('/\*\*/', '</b>', $match, 1); 
 		};
 		// Unterstrichen:
-		while (strpos($match, '__') !== false) {
+		while ((strpos($match, ' __') !== false) or (strpos($match, '__ ') !== false)) {
 			$match = preg_replace('/__/', '<u>', $match, 1); 
 			$match = preg_replace('/__/', '</u>', $match, 1); 
 		};
@@ -102,6 +109,7 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 			$match = preg_replace('/\[\[/', '<a href="'.DOKU_BASE.'/doku.php?id=', $match, 1); 
 			$match = preg_replace('/\]\]/', '">'.$title.'</a>', $match, 1); 
 		};
+
 				
 		// Platzhalter für Namensraum und aktuelle Seite:
 		while (strpos($match, '@PAGE@') !== false) {
@@ -122,6 +130,7 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 		while (strpos($match, '@URL_PAGE@') !== false) {
 			$match = preg_replace('/@URL_PAGE@/', $urlpage, $match, 1); 
 		}
+
 		
 		// Parameter aufspalten:
 		$param = explode('|-',$match);
@@ -139,11 +148,13 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 			}
 			else { 				
 				// HTML-Zeile enthält Code
-				$var = $var.$zeilen[$i];
+				$z_trim = trim($zeilen[$i]);
+				$var = $var.$z_trim;
 			}
 		}
 
-        // Übergabe-Wert für Renderer
+
+        // Übergabe-Wert für Renderer:
         return $var;
     }
 
