@@ -72,24 +72,18 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 		
 		
 		// Steuerzeichen im Wiki-Code verarbeiten:
-		// (gilt nur für komplette Wörter mit führendem und nachfolgendem Leerzeichen)
 		
 		//zwei hintereinanderfolgende Leerzeichen sollen als Einrückung ausgegeben werden:
 		$match = str_replace(array("  "), '&nbsp; &nbsp;', $match);  		
 		// Kursivschrift:
-		while ((strpos($match, ' //') !== false) or (strpos($match, '// ') !== false)) {
+		while (strpos($match, '//') !== false) {
 			$match = preg_replace('/\/\//', '<i>', $match, 1); 
 			$match = preg_replace('/\/\//', '</i>', $match, 1); 
 		};
 		// Fettschrift:
-		while ((strpos($match, ' **') !== false) or (strpos($match, '** ') !== false)) {
+		while (strpos($match, '**') !== false) {
 			$match = preg_replace('/\*\*/', '<b>', $match, 1); 
 			$match = preg_replace('/\*\*/', '</b>', $match, 1); 
-		};
-		// Unterstrichen:
-		while ((strpos($match, ' __') !== false) or (strpos($match, '__ ') !== false)) {
-			$match = preg_replace('/__/', '<u>', $match, 1); 
-			$match = preg_replace('/__/', '</u>', $match, 1); 
 		};
 		// Codetext:
 		while (strpos($match, "''") !== false) {

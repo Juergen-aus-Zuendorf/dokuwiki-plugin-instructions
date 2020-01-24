@@ -1,7 +1,7 @@
 base   instructions
 author Juergen Schuemmer
 email  h-j-schuemmer@web.de
-date   2020-01-23
+date   2020-01-24
 name   instructions plugin
 desc   Special syntax for instructions
 url    http://dokuwiki.org/plugin:instructions
