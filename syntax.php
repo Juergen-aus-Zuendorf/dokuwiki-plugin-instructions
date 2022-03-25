@@ -20,7 +20,7 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
     }
 
     function getSort() {
-        return 169;             /* ??? */
+        return 16;             /* ??? */
     }
 
     function connectTo($mode) {
@@ -49,7 +49,14 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 		if (strrpos($ns_long,":") > 0) {
 			$ns_curr = substr(strrchr($ns_long, ":"), 1);
 		};
+		$ns_main = $INFO['namespace'];    // Namespce bei Verwendung in der Sidebar
 
+// echo "ID :", $ID, "<br />";
+// echo "INFO['id'] :", $INFO['id'], "<br />";
+// echo "INFO['namespace'] :", $INFO['namespace'], "<br />";
+// echo "ns_long :", $ns_long, "<br />";
+// echo "ns_curr :", $ns_curr, "<br />";
+// echo "ns_main :", $ns_main, "<br />";
 				
         // Eingabe-Wert verarbeiten
 		$match = str_replace("{{INSTR<", '', $match);
@@ -114,6 +121,9 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 		}
 		while (strpos($match, '@NS@') !== false) {
 			$match = preg_replace('/@NS@/', $ns_long, $match, 1); 
+		}
+		while (strpos($match, '@NSMAIN@') !== false) {
+			$match = preg_replace('/@NSMAIN@/', $ns_main, $match, 1); 
 		}
 		while (strpos($match, '@CURNS@') !== false) {
 			$match = preg_replace('/@CURNS@/', $ns_curr, $match, 1); 
