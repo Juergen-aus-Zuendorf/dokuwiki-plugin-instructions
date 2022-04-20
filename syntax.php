@@ -15,21 +15,21 @@ require_once DOKU_PLUGIN.'syntax.php';
 
 class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 
-    function getType() {
-        return 'substition';
-    }
+	function getType() {
+		return 'substition';
+	}
 
-    function getSort() {
-        return 16;             /* ??? */
-    }
+	function getSort() {
+		return 16;
+	}
 
-    function connectTo($mode) {
-        $this->Lexer->addSpecialPattern('~~INSTR~~.*?~~END~~',$mode,'plugin_instructions');   // Syntax funktioniert zusammen mit Plugin CKGEdit
-        $this->Lexer->addSpecialPattern('{{INSTR<.*?}}',$mode,'plugin_instructions');         // veraltet wegen CKGEdit
-    }
+	function connectTo($mode) {
+		$this->Lexer->addSpecialPattern('~~INSTR~~.*?~~END~~',$mode,'plugin_instructions');   // Syntax funktioniert zusammen mit Plugin CKGEdit
+		$this->Lexer->addSpecialPattern('{{INSTR<.*?}}',$mode,'plugin_instructions');         // veraltet wegen CKGEdit
+	}
 
-    function handle($match, $state, $pos, Doku_Handler $handler){
-		
+	function handle($match, $state, $pos, Doku_Handler $handler){
+
 		// aktuelle Seite "@ID@" und "@PAGE@":
 		global $ID, $INFO;
 		$urldoku = DOKU_URL;
@@ -49,7 +49,7 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 		if (strrpos($ns_long,":") > 0) {
 			$ns_curr = substr(strrchr($ns_long, ":"), 1);
 		};
-		$ns_main = $INFO['namespace'];    // Namespce bei Verwendung in der Sidebar
+		$ns_main = $INFO['namespace'];		// Namespce bei Verwendung in der Sidebar
 
 // echo "ID :", $ID, "<br />";
 // echo "INFO['id'] :", $INFO['id'], "<br />";
@@ -57,14 +57,13 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 // echo "ns_long :", $ns_long, "<br />";
 // echo "ns_curr :", $ns_curr, "<br />";
 // echo "ns_main :", $ns_main, "<br />";
-				
-        // Eingabe-Wert verarbeiten
+
+		// Eingabe-Wert verarbeiten
 		$match = str_replace("{{INSTR<", '', $match);
 		$match = str_replace("}}", '', $match);
 		$match = str_replace("~~INSTR~~", '', $match);
 		$match = str_replace("~~END~~", '', $match);
-		
-		
+
 		// Typ des Templates auslesen
 		if (substr_count($match,"~~") > 0) {
 			list($typ) = explode('~~',$match);
@@ -72,16 +71,13 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 			list($typ) = explode('>',$match);
 		}
 		$typ = strtolower($typ);
-		
-		
+
 		// Zeilenumbruch verarbeiten:
 		$match = str_replace(array("|+"), '<br>', $match);
-		
-		
+
 		// Steuerzeichen im Wiki-Code verarbeiten:
-		
 		//zwei hintereinanderfolgende Leerzeichen sollen als Einrückung ausgegeben werden:
-		$match = str_replace(array("  "), '&nbsp; &nbsp;', $match);  		
+		$match = str_replace(array("  "), '&nbsp; &nbsp;', $match);
 		// Kursivschrift:
 		while (strpos($match, '//') !== false) {
 			$match = preg_replace('/\/\//', '<i>', $match, 1); 
@@ -111,7 +107,6 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 			$match = preg_replace('/\]\]/', '">'.$title.'</a>', $match, 1); 
 		};
 
-				
 		// Platzhalter für Namensraum und aktuelle Seite:
 		while (strpos($match, '@PAGE@') !== false) {
 			$match = preg_replace('/@PAGE@/', $pg_curr, $match, 1); 
@@ -135,39 +130,43 @@ class syntax_plugin_instructions extends DokuWiki_Syntax_Plugin {
 			$match = preg_replace('/@URL_PAGE@/', $urlpage, $match, 1); 
 		}
 
-		
 		// Parameter aufspalten:
 		$param = explode('|-',$match);
-		
-		$datei='tpl/'.$typ.'/html.txt';
 
+		$datei='tpl/'.$typ.'/html.txt';
 		$zeilen = file($datei,true);
-		
+
 		for($i=1; $i<count($zeilen); $i++) {
 			list($p, $z) = explode('-',$zeilen[$i]);
 			$z = (int)$z;
-			if ($p == "param") {   
-				// HTML-Zeile enthält Platzhalter für Parameter           
-				$var = $var.trim($param[$z]);
+			if ($p == "param") {
+				// HTML-Zeile enthält Platzhalter für Parameter
+				$tpz = trim($param[$z]);
+				$var = $var.$tpz;
 			}
-			else { 				
+			else {
 				// HTML-Zeile enthält Code
 				$z_trim = trim($zeilen[$i]);
-				$var = $var.$z_trim;
+				if ((($z_trim == "<br>") or ($z_trim == "<br />")) and ($tpz == "")) {
+					// falls zuvor kein Parameter übergeben wurde, den ersten nachfolgenden Zeilenumbruch unterdrücken
+					$tpz = "leer";
+				}
+				else {
+					$var = $var.$z_trim;
+				}
 			}
 		}
 
+		// Übergabe-Wert für Renderer:
+		return $var;
+	}
 
-        // Übergabe-Wert für Renderer:
-        return $var;
-    }
-
-     function render($mode, Doku_Renderer $renderer, $data) {
-        if($mode == 'xhtml'){           
-            $renderer->doc .= $data;
-            return true;
-        }
-        return false;
-    }
+	function render($mode, Doku_Renderer $renderer, $data) {
+		if($mode == 'xhtml'){
+			$renderer->doc .= $data;
+			return true;
+		}
+		return false;
+	}
 }
 ?>
